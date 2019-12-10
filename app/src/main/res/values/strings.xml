@@ -1,0 +1,53 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">MondayFairy</string>
+    <string name="alarm_describe">월요요정이 울리는 주기를 월요일마다 하는 걸로 추천드립니다</string>
+    <string name="alarm_date">일정선택</string>
+    <string name="alarm_time">Time</string>
+    <string name="alarm_date_spinner_default">날짜선택</string>
+    <string name="alarm_text_spinner_default">시간선택</string>
+    <string name="member_pick_text">멤버선택(다중선택 가능, 모두제외)</string>
+    <string name="setting_save_text">설정완료</string>
+    <string-array name="array_alarm_date">
+        <item>매일마다</item>
+        <item>3일마다</item>
+        <item>일주일마다</item>
+        <item>한달마다</item>
+        <item>특정일선택</item>
+    </string-array>
+    <string-array name="array_member_names">
+        <item>원영</item>
+        <item>꾸라</item>
+        <item>유리</item>
+        <item>예나</item>
+        <item>유진</item>
+        <item>나코</item>
+        <item>은비</item>
+        <item>혜원</item>
+        <item>히짱</item>
+        <item>채원</item>
+        <item>민주</item>
+        <item>채연</item>
+        <item>모두</item>
+    </string-array>
+    <string-array name="array_member_names_eng">
+        <item>wonyoung</item>
+        <item>sakura</item>
+        <item>yuri</item>
+        <item>yena</item>
+        <item>yujin</item>
+        <item>nako</item>
+        <item>eunbi</item>
+        <item>hyewon</item>
+        <item>hitomi</item>
+        <item>chaewon</item>
+        <item>minju</item>
+        <item>cheayeon</item>
+        <item>izone</item>
+    </string-array>
+    <string name="save_confirm_dialog_title">설정완료</string>
+    <string name="save_confirm_dialog_message">월요요정과의 통화를 위한 준비가 끝났습니다!\n그럼 월요요정이 찾아올때까지 기다려주세요!</string>
+    <string name="positive_btn_text">확인</string>
+    <string name="call_end_text">통화종료</string>
+    <string name="talk_time_default_text">00:00</string>
+    <string name="track_selection_title">Select tracks</string>
+</resources>
