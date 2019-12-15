@@ -2,37 +2,47 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tool="http://schemas.android.com/tools">
-    <LinearLayout
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:orientation="vertical"
-        android:id="@+id/layout_call_end_text"
-        android:paddingTop="32dp"
-        android:background="@color/colorCallEnd"
+        android:id="@+id/image_talk_user_view"
+        android:scaleType="fitXY"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintHeight_percent="0.3">
+        app:layout_constraintBottom_toTopOf="@id/layout_call_end_text"
+        app:layout_constraintDimensionRatio="1:1"
+        tool:background="@drawable/thumb_chaewon_190513"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/text_end_call_view"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:text="@string/call_end_text"
         android:textSize="22sp"
         android:textColor="@android:color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:id="@+id/layout_call_end_text"
+        android:background="@color/colorCallEnd"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/image_talk_user_view"
+        app:layout_constraintBottom_toBottomOf="parent">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/text_talk_user_name_view"
         android:layout_marginTop="32dp"
-        android:textSize="28sp"
+        android:textSize="30sp"
         android:textAlignment="center"
         android:textColor="@android:color/white"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,21 +55,13 @@
         android:id="@+id/text_talk_time_view"
         android:layout_marginBottom="8dp"
         android:text="@string/talk_time_default_text"
-        android:textSize="25sp"
+        android:textSize="28sp"
         android:textAlignment="center"
         android:textColor="@android:color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_talk_user_name_view"/>
     </LinearLayout>
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:id="@+id/image_talk_user_view"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_call_end_text"
-        app:layout_constraintHeight_percent="0.4"
-        tool:background="@color/colorAccent"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

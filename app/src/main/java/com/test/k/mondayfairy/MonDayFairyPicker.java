@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.widget.CompoundButton;
 import android.widget.GridLayout;
 
@@ -15,7 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static android.content.Context.MODE_PRIVATE;
-
+/*사용자가 원하는 월요요정을 선택할 수 있는 체크박스를 생성하는 클래스*/
 public class MonDayFairyPicker extends GridLayout implements CompoundButton.OnCheckedChangeListener {
     private final int NUMBER_OF_MEMBER = 12;
     AppCompatCheckBox[] memberCheckedBox = new AppCompatCheckBox[NUMBER_OF_MEMBER + 1];
@@ -42,15 +43,20 @@ public class MonDayFairyPicker extends GridLayout implements CompoundButton.OnCh
         float textSize = 24;
         this.setColumnCount(column);
         this.setRowCount(row + 1);
-        Spec rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 1);
-        Spec colspan = GridLayout.spec(GridLayout.UNDEFINED, 1);
+        Spec rowSpan = null;
+        Spec colSpan = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 1,1);
+            colSpan = GridLayout.spec(GridLayout.UNDEFINED, 1,1);
+        }
         Resources res = getResources();
         String[] names = res.getStringArray(R.array.array_member_names);
         int checkBoxSize = memberCheckedBox.length;
         for (int i = 0; i < checkBoxSize; i++) {
             memberCheckedBox[i] = new AppCompatCheckBox(this.getContext());
             GridLayout.LayoutParams gridParam = new GridLayout.LayoutParams(
-                    rowSpan, colspan);
+                    rowSpan, colSpan);
+            gridParam.setGravity(Gravity.CENTER);
             memberCheckedBox[i].setText(names[i]);
             memberCheckedBox[i].setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
             memberCheckedBox[i].setOnCheckedChangeListener(this);

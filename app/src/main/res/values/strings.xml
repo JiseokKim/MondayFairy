@@ -1,19 +1,15 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">MondayFairy</string>
-    <string name="alarm_describe">월요요정이 울리는 주기를 월요일마다 하는 걸로 추천드립니다</string>
+    <string name="app_names">MondayFairy</string>
+    <string name="app_name">월요요정이 보고싶어</string>
+    <string name="alarm_describe">*간단 사용법*
+        \n1.날짜와 시간을 선택합니다.
+        \n2.멤버를 선택하고 설정을 저장하면 월요요정에게 연락이 옵니다.</string>
     <string name="alarm_date">일정선택</string>
     <string name="alarm_time">Time</string>
     <string name="alarm_date_spinner_default">날짜선택</string>
     <string name="alarm_text_spinner_default">시간선택</string>
     <string name="member_pick_text">멤버선택(다중선택 가능, 모두제외)</string>
     <string name="setting_save_text">설정완료</string>
-    <string-array name="array_alarm_date">
-        <item>매일마다</item>
-        <item>3일마다</item>
-        <item>일주일마다</item>
-        <item>한달마다</item>
-        <item>특정일선택</item>
-    </string-array>
     <string-array name="array_member_names">
         <item>원영</item>
         <item>꾸라</item>
@@ -41,13 +37,30 @@
         <item>hitomi</item>
         <item>chaewon</item>
         <item>minju</item>
-        <item>cheayeon</item>
+        <item>chaeyeon</item>
         <item>izone</item>
     </string-array>
+    <string-array name="array_call_users">
+        <item>워뇽이</item>
+        <item>꾸라</item>
+        <item>조댕찌</item>
+        <item>최오리</item>
+        <item>안유댕</item>
+        <item>나코나코땅땅</item>
+        <item>권땡모</item>
+        <item>강광배</item>
+        <item>히짱</item>
+        <item>자몽워니</item>
+        <item>밍주가또오~!</item>
+        <item>이째욘</item>
+    </string-array>
     <string name="save_confirm_dialog_title">설정완료</string>
+    <string name="fail_confirm_dialog_title">설정미완료</string>
     <string name="save_confirm_dialog_message">월요요정과의 통화를 위한 준비가 끝났습니다!\n그럼 월요요정이 찾아올때까지 기다려주세요!</string>
+    <string name="fail_confirm_dialog_message">\n다시 확인하시고 설정을 완료해주세요</string>
     <string name="positive_btn_text">확인</string>
     <string name="call_end_text">통화종료</string>
     <string name="talk_time_default_text">00:00</string>
-    <string name="track_selection_title">Select tracks</string>
+    <string name="channel_name">월요요정 알림</string>
+    <string name="channel_description">월요요정 알림채널</string>
 </resources>

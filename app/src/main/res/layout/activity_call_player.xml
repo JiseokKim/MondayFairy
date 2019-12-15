@@ -18,21 +18,55 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/view_container">
+        android:id="@+id/view_container"
+        tools:background="@color/colorCallEnd">
+        <include
+            layout="@layout/toolbar"
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/text_call_name_view"
+            android:textSize="25sp"
+            android:textColor="@android:color/white"
+            android:visibility="invisible"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.35"
+            tools:visibility="visible"
+            tools:text="@string/app_name"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/text_call_view"
+            android:text="전화가 왔습니다"
+            android:textSize="20sp"
+            android:textColor="@android:color/white"
+            android:visibility="invisible"
+            app:layout_constraintTop_toBottomOf="@id/text_call_name_view"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:visibility="visible"/>
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_bottom"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.95" />
+            app:layout_constraintGuide_percent="0.925" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_left"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.20" />
+            app:layout_constraintGuide_percent="0.18" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_right"
@@ -42,21 +76,31 @@
             app:layout_constraintGuide_percent="0.80" />
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
             android:id="@+id/call_play_btn"
-            android:background="@drawable/player_start"
+            android:background="@android:color/transparent"
             android:contentDescription=""
             app:layout_constraintBottom_toTopOf="@id/guideline_bottom"
             app:layout_constraintRight_toRightOf="@id/guideline_right" />
 
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/call_off_btn"
-            android:background="@drawable/player_stop"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:background="@android:color/transparent"
             android:contentDescription=""
+            app:layout_goneMarginEnd="0dp"
             app:layout_constraintBottom_toTopOf="@id/guideline_bottom"
-            app:layout_constraintLeft_toLeftOf="@id/guideline_left" />
+            app:layout_constraintStart_toStartOf="@id/guideline_left" />
+        <ImageButton
+            android:id="@+id/call_camera_btn"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:background="@android:color/transparent"
+            android:contentDescription=""
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toTopOf="@id/guideline_bottom"
+            app:layout_constraintEnd_toStartOf="@id/guideline_left" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -4,4 +4,17 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="colorCallEnd">#EF7215</color>
+    <!--Izone Member Color-->
+    <color name="wonwyoung">#d9598c</color>
+    <color name="sakura">#f1d2e7</color>
+    <color name="yuri">#f3aa51</color>
+    <color name="yena">#fcf695</color>
+    <color name="yujin">#567ace</color>
+    <color name="nako">#b7d3e9</color>
+    <color name="eunbi">#bbb0dc</color>
+    <color name="hyewon">#db706c</color>
+    <color name="hitomi">#f1c3aa</color>
+    <color name="chaewon">#cee5d5</color>
+    <color name="minju">#ffffff</color>
+    <color name="chaeyeon">#a7e0e1</color>
 </resources>
