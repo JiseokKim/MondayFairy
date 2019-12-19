@@ -1,12 +1,14 @@
 package com.test.k.mondayfairy.activity;
 
 
+import android.Manifest;
 import android.app.KeyguardManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
@@ -20,8 +22,8 @@ import android.os.SystemClock;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.TextureView;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -45,6 +47,7 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.test.k.mondayfairy.UserFaceView;
 import com.test.k.mondayfairy.fragment.CallPlayerEndFragment;
 import com.test.k.mondayfairy.CallUser;
 import com.test.k.mondayfairy.manager.CallUserManager;
@@ -75,7 +78,9 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
     private boolean ringToneStart = true;
     private AudioManager audioManager;
     private CallUser callUser;
-
+    public static final int REQUEST_CAMERA = 1;
+    private TextureView cameraTextureView;
+    private UserFaceView userFaceView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +106,8 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void uiInit() {
+        cameraTextureView =  findViewById(R.id.cameraTextureView);
+        userFaceView = new UserFaceView(this, cameraTextureView);
         playerView = findViewById(R.id.player_view);
         //player controller hide
         playerView.setUseController(false);
@@ -116,17 +123,22 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
         //비디오 영상이 전화전용 영상일경우 필요없는 가짜 상태바를 제거한다
         if (callUser.getVideoCode().equals("call")) {
             ConstraintLayout toolbarLayout = findViewById(R.id.toolbar);
-            toolbarLayout.setVisibility(View.GONE);
+            toolbarLayout.setVisibility(View.INVISIBLE);
         } else {//비디오 영상이 전화전용 영상이 아닐경우 재생 시작 지점을 0으로 초기화한다
             START_PLAY_POSITION = 0;
             callNameTextView.setText(callUser.getCallName());
             callNameTextView.setVisibility(View.VISIBLE);
             callTextView.setVisibility(View.VISIBLE);
             //영상통화 화면처럼 버튼에 이미지를 씌움
-            callPlayBtn.setBackgroundResource(R.drawable.player_start);
-            callOffBtn.setBackgroundResource(R.drawable.player_stop);
-
+            callPlayBtn.setBackgroundResource(R.drawable.backgroud_circle_green_button);
+            callPlayBtn.setImageResource(R.drawable.ic_call);
+            callOffBtn.setBackgroundResource(R.drawable.backgroud_circle_red_button);
+            callOffBtn.setImageResource(R.drawable.ic_call_end);
+            cameraBtn.setBackgroundResource(R.drawable.backgroud_circle_button);
+            cameraBtn.setImageResource(R.drawable.ic_videocam);
         }
+        //영상재생전까지 화면에 보일 필요 없음
+        cameraBtn.setVisibility(View.INVISIBLE);
     }
 
     private void callUserInit() {
@@ -146,7 +158,6 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onStart() {
         super.onStart();
-
         initPlayer();
         preventSleepModeOnLockScreen();
     }
@@ -193,7 +204,21 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
             timer.schedule(timerTask, 0, 4500);
         }
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(userFaceView!=null) {
+            userFaceView.onResume();
+        }
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(userFaceView!=null) {
+            userFaceView.onPause();
+        }
+    }
     @Override
 
     protected void onStop() {
@@ -324,6 +349,7 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
                 player.setPlayWhenReady(true);
                 callPlayBtn.setVisibility(View.GONE);
                 moveCallOffBtn();
+                cameraBtn.setVisibility(View.VISIBLE);
                 break;
             case R.id.call_off_btn:
                 if (player.isPlaying()) {
@@ -333,6 +359,24 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
                 moveToCallEndFragment(createBundleData());
                 break;
             case R.id.call_camera_btn:
+                PackageManager pm = this.getPackageManager();
+                if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)) {
+                    if(cameraTextureView.getVisibility()==View.INVISIBLE) {//전면카메라 사용
+                        cameraTextureView.setVisibility(View.VISIBLE);
+                        userFaceView.openCamera();
+                        if(callUser.getVideoCode().equals("mov")) {
+                            cameraBtn.setImageResource(R.drawable.ic_videocam_off);
+                        }
+                    }else{//카메라 사용하지 않음
+                        cameraTextureView.setVisibility(View.INVISIBLE);
+                        userFaceView.onPause();
+                        if(callUser.getVideoCode().equals("mov")) {
+                            cameraBtn.setImageResource(R.drawable.ic_videocam);
+                        }
+                    }
+                }else{
+                    Toast.makeText(this, "현재 전면 카메라를 지원하지 않는 기기입니다.", Toast.LENGTH_SHORT).show();
+                }
                 break;
 
         }
@@ -346,20 +390,29 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
         constraintSet.clear(callOffBtn.getId(), ConstraintSet.BOTTOM);
         constraintSet.clear(cameraBtn.getId(), ConstraintSet.END);
         constraintSet.clear(cameraBtn.getId(), ConstraintSet.BOTTOM);
-
+        //영상화면 종류에 맞춰 버튼 위치를 재배열
         if(callUser.getVideoCode().equals("mov")){
+            float bottomGuideBias = 0.92f;
             constraintSet.connect(callOffBtn.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 0);
             constraintSet.connect(callOffBtn.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
             constraintSet.connect(callOffBtn.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 0);
             constraintSet.connect(callOffBtn.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0);
             //값이 0에 가까울수록 Top 방향에 가깝다
-            constraintSet.setVerticalBias(callOffBtn.getId(), 0.92f);
+            constraintSet.setHorizontalBias(callOffBtn.getId(), 0.65f);
+            constraintSet.setVerticalBias(callOffBtn.getId(), bottomGuideBias);
+            constraintSet.connect(cameraBtn.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 0);
+            constraintSet.connect(cameraBtn.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
+            constraintSet.connect(cameraBtn.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 0);
+            constraintSet.connect(cameraBtn.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0);
+            //값이 0에 가까울수록 Top 방향에 가깝다
+            constraintSet.setHorizontalBias(cameraBtn.getId(), 0.35f);
+            constraintSet.setVerticalBias(cameraBtn.getId(), bottomGuideBias);
         }else {
             constraintSet.connect(callOffBtn.getId(), ConstraintSet.END, R.id.guideline_right, ConstraintSet.END, 0);
             constraintSet.connect(callOffBtn.getId(), ConstraintSet.BOTTOM, R.id.guideline_bottom, ConstraintSet.TOP, 0);
+            constraintSet.connect(cameraBtn.getId(), ConstraintSet.END, callOffBtn.getId(), ConstraintSet.START, 16);
+            constraintSet.connect(cameraBtn.getId(), ConstraintSet.BOTTOM, R.id.guideline_bottom, ConstraintSet.TOP, 0);
         }
-        constraintSet.connect(cameraBtn.getId(), ConstraintSet.END, callOffBtn.getId(), ConstraintSet.START, 16);
-        constraintSet.connect(cameraBtn.getId(), ConstraintSet.BOTTOM, R.id.guideline_bottom, ConstraintSet.TOP, 0);
         constraintSet.applyTo(constraintLayout);
     }
 
@@ -492,8 +545,6 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
             callRingStop();
             timer.cancel();
 //            Log.d(TAG, "ringtone is playing:"+ringtone.isPlaying());
-        }else{
-
         }
     }
 
@@ -586,7 +637,29 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
         android.os.Process.killProcess(android.os.Process.myPid());
 
     }
-
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_CAMERA:
+                for (int i = 0; i < permissions.length; i++) {
+                    String permission = permissions[i];
+                    int grantResult = grantResults[i];
+                    if (permission.equals(Manifest.permission.CAMERA)) {
+                        if (grantResult == PackageManager.PERMISSION_GRANTED) {
+//                            cameraTextureView = findViewById(R.id.cameraTextureView);
+//                            userFaceView = new UserFaceView(this, cameraTextureView);
+//                            userFaceView.openCamera();
+                            Log.d(TAG, "mPreview set");
+                        } else {
+                            Toast.makeText(this, "Should have camera permission to run", Toast.LENGTH_LONG).show();
+                            finish();
+                        }
+                    }
+                }
+                break;
+        }
+    }
 }
 
 

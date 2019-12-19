@@ -3,13 +3,18 @@ package com.test.k.mondayfairy.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
@@ -57,6 +62,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         saveBtn.setOnClickListener(this);
         Button nowCallBtn = findViewById(R.id.btn_now_fairy_call);
         nowCallBtn.setOnClickListener(this);
+        //카메라 권한체크
+        int permissionCamera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        if (permissionCamera == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CallPlayerActivity.REQUEST_CAMERA);
+        }
     }
 
     @Override

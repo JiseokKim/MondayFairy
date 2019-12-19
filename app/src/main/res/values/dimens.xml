@@ -7,4 +7,5 @@
     <dimen name="toolbar_title_text_size">18dp</dimen>
     <dimen name="dev_purpose_dialog_content_text_size">20sp</dimen>
     <dimen name="date_time_value_text_size">25sp</dimen>
+    <dimen name="call_player_btn_size">72dp</dimen>
 </resources>

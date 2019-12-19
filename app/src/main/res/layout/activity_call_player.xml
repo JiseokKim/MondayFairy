@@ -23,6 +23,15 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
+        <TextureView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:id="@+id/cameraTextureView"
+            android:visibility="invisible"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintDimensionRatio="3:4"
+            app:layout_constraintWidth_percent="0.28"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -55,14 +64,14 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.925" />
+            app:layout_constraintGuide_percent="0.93" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_left"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.18" />
+            app:layout_constraintGuide_percent="0.185" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline_right"
@@ -72,8 +81,8 @@
             app:layout_constraintGuide_percent="0.80" />
 
         <ImageButton
-            android:layout_width="96dp"
-            android:layout_height="96dp"
+            android:layout_width="@dimen/call_player_btn_size"
+            android:layout_height="@dimen/call_player_btn_size"
             android:id="@+id/call_play_btn"
             android:background="@android:color/transparent"
             android:contentDescription=""
@@ -81,18 +90,18 @@
             app:layout_constraintRight_toRightOf="@id/guideline_right" />
 
         <ImageButton
+            android:layout_width="@dimen/call_player_btn_size"
+            android:layout_height="@dimen/call_player_btn_size"
             android:id="@+id/call_off_btn"
-            android:layout_width="96dp"
-            android:layout_height="96dp"
             android:background="@android:color/transparent"
             android:contentDescription=""
             app:layout_goneMarginEnd="0dp"
             app:layout_constraintBottom_toTopOf="@id/guideline_bottom"
             app:layout_constraintStart_toStartOf="@id/guideline_left" />
         <ImageButton
+            android:layout_width="@dimen/call_player_btn_size"
+            android:layout_height="@dimen/call_player_btn_size"
             android:id="@+id/call_camera_btn"
-            android:layout_width="96dp"
-            android:layout_height="96dp"
             android:background="@android:color/transparent"
             android:contentDescription=""
             android:layout_marginEnd="16dp"
