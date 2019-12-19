@@ -11,10 +11,6 @@
         android:layout_height="match_parent"
         app:resize_mode="fill"
         tools:backgroud="@color/black" />
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/image_thumbnail_view"/>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

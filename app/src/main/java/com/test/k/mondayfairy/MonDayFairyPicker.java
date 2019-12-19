@@ -50,6 +50,7 @@ public class MonDayFairyPicker extends GridLayout implements CompoundButton.OnCh
             colSpan = GridLayout.spec(GridLayout.UNDEFINED, 1,1);
         }
         Resources res = getResources();
+        int checkBoxHeightSize = (int)res.getDimension(R.dimen.member_picker_minHeight);
         String[] names = res.getStringArray(R.array.array_member_names);
         int checkBoxSize = memberCheckedBox.length;
         for (int i = 0; i < checkBoxSize; i++) {
@@ -61,6 +62,7 @@ public class MonDayFairyPicker extends GridLayout implements CompoundButton.OnCh
             memberCheckedBox[i].setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
             memberCheckedBox[i].setOnCheckedChangeListener(this);
             memberCheckedBox[i].setId(i);
+            memberCheckedBox[i].setMinimumHeight(checkBoxHeightSize);
             this.addView(memberCheckedBox[i], gridParam);
         }
         checkedPickerMember(context);

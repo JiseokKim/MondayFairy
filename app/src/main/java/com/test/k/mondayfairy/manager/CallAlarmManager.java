@@ -37,8 +37,10 @@ public class CallAlarmManager {
         Log.d(this.getClass().getSimpleName(),"예약시간"+calendar.getTimeInMillis());
         if(Build.VERSION.SDK_INT>=23) {
             alarmMgr.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
+            //alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+            //        1000 * 60 * 4, alarmIntent);
         }else{
-            if(Build.VERSION.SDK_INT>=19){
+            if(Build.VERSION.SDK_INT>=21){
                 alarmMgr.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
             }else{
                 alarmMgr.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);

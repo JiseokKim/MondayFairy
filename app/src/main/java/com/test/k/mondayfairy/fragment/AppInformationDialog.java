@@ -34,6 +34,7 @@ public class AppInformationDialog extends DialogFragment  {
         View view = inflater.inflate(R.layout.layout_app_information_dialog, container, false);
         Toolbar toolbar = view.findViewById(R.id.dialog_toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_close_white_24dp);
+        toolbar.setNavigationContentDescription(R.string.dev_purpose_close_description_text);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/alarm_date_text"
         android:text="@string/alarm_date"
-        android:textSize="28sp"
+        android:textSize="@dimen/date_time_picker_title_text_size"
         android:layout_marginStart="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/alarm_describe_text" />
@@ -38,6 +38,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/btn_date_picker"
         android:text="날짜선택"
+        android:textColor="@color/minju"
+        android:backgroundTint="@color/colorPrimary"
+        android:contentDescription="@string/date_picker_btn_description_text"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/alarm_date_text"
         app:layout_constraintWidth_percent="0.5"/>
@@ -46,6 +49,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/btn_time_picker"
         android:text="시간선택"
+        android:textColor="@color/minju"
+        android:backgroundTint="@color/colorPrimary"
+        android:contentDescription="@string/time_picker_btn_description_text"
         app:layout_constraintStart_toEndOf="@id/btn_date_picker"
         app:layout_constraintTop_toBottomOf="@id/alarm_date_text"
         app:layout_constraintWidth_percent="0.5"/>
@@ -53,7 +59,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/time_picker_value"
-        android:textSize="25sp"
+        android:textSize="@dimen/date_time_value_text_size"
         android:textAlignment="center"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_time_picker"
@@ -63,7 +69,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/date_picker_value"
-        android:textSize="25sp"
+        android:textSize="@dimen/date_time_value_text_size"
         android:textAlignment="center"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_date_picker"
@@ -72,36 +78,41 @@
     <include
         layout="@layout/layout_member_pick"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:id="@+id/layout_member_pick"
         android:layout_marginTop="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/date_picker_value"/>
+        app:layout_constraintTop_toBottomOf="@id/date_picker_value"
+        app:layout_constraintHeight_percent="0.5"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/layout_call_save_btn_group"
+        android:gravity="end"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_member_pick">
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btn_setting_save"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="8dp"
         android:text="@string/setting_save_text"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_member_pick"/>
-<!--
-    <Spinner
-        android:id="@+id/alarm_date_spinner"
-        android:layout_width="140dp"
+        android:textColor="@color/minju"
+        android:backgroundTint="@color/yujin"
+        android:contentDescription="@string/alarm_setting_btn_description_text" />
+    <Button
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:entries="@array/array_alarm_date"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/alarm_date_text"/>
-
-    <Spinner
-        android:id="@+id/alarm_time_spinner"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toRightOf="@id/alarm_date_spinner"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/alarm_time_text"/>
--->
+        android:id="@+id/btn_now_fairy_call"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/fairy_call_text"
+        android:textColor="@color/minju"
+        android:backgroundTint="@color/yujin"
+        android:contentDescription="@string/call_now_btn_description_text" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

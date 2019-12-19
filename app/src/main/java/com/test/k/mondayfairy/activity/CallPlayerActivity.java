@@ -1,6 +1,7 @@
 package com.test.k.mondayfairy.activity;
 
 
+import android.app.KeyguardManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -14,12 +15,17 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.SystemClock;
 import android.os.Vibrator;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -73,8 +79,7 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, Crashlytics.getInstance());
-        WakeLockUtil.acquireCpuWakeLock(this);
+        WakeLockUtil.acquireCpuWakeLock(this, PowerManager.PARTIAL_WAKE_LOCK);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN |
                         WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
                         WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
@@ -86,6 +91,7 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
                         WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
                         WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_call_player);
+        Fabric.with(this, Crashlytics.getInstance());
         createNotificationChannel();
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         timer = new Timer();
@@ -98,6 +104,7 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
         playerView = findViewById(R.id.player_view);
         //player controller hide
         playerView.setUseController(false);
+        playerView.setKeepScreenOn(true);//잠금화면에서 화면이 꺼지지 않게 설정
         callPlayBtn = findViewById(R.id.call_play_btn);
         callOffBtn = findViewById(R.id.call_off_btn);
         cameraBtn = findViewById(R.id.call_camera_btn);
@@ -141,9 +148,51 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
         super.onStart();
 
         initPlayer();
-
+        preventSleepModeOnLockScreen();
     }
-
+    //잠금화면위에서 액티비티 실행시 계속 실행중 화면이 꺼지는 현상 발생.
+    //임시로 화면 터치 이벤트를 발생시켜 화면 꺼짐을 막는다.
+    private void preventSleepModeOnLockScreen(){
+        KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        if(keyguardManager.isKeyguardLocked()) {
+            playerView.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    Log.d(TAG, "View Touch");
+                    return true;
+                }
+            });
+            // Obtain MotionEvent object
+            long downTime = SystemClock.uptimeMillis();
+            long eventTime = SystemClock.uptimeMillis() + 100;
+            float x = 100.0f;
+            float y = 100.0f;
+// List of meta states found here: developer.android.com/reference/android/view/KeyEvent.html#getMetaState()
+            int metaState = 0;
+            final MotionEvent motionEvent = MotionEvent.obtain(
+                    downTime,
+                    eventTime,
+                    MotionEvent.ACTION_UP,
+                    x,
+                    y,
+                    metaState
+            );
+            TimerTask timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Dispatch touch event to view
+                            playerView.dispatchTouchEvent(motionEvent);
+                            Toast.makeText(getApplicationContext(), "touch", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            };
+            Timer timer = new Timer();
+            timer.schedule(timerTask, 0, 4500);
+        }
+    }
 
     @Override
 
@@ -250,7 +299,7 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
 
     private Bundle createBundleData() {
         long millis = player.getCurrentPosition();
-        String playTime = String.format("%02d:%02d",
+        String playTime = String.format(Locale.US,"%02d:%02d",
                 TimeUnit.MILLISECONDS.toMinutes(millis),
                 TimeUnit.MILLISECONDS.toSeconds(millis) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis))
@@ -274,30 +323,7 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
                 player.seekTo(START_PLAY_POSITION);
                 player.setPlayWhenReady(true);
                 callPlayBtn.setVisibility(View.GONE);
-                ConstraintLayout constraintLayout = findViewById(R.id.view_container);
-                ConstraintSet constraintSet = new ConstraintSet();
-                constraintSet.clone(constraintLayout);
-                //기존 컴포넌트들끼리 연결 끊기
-                constraintSet.clear(callOffBtn.getId(), ConstraintSet.START);
-                constraintSet.clear(callOffBtn.getId(), ConstraintSet.BOTTOM);
-
-                constraintSet.clear(cameraBtn.getId(), ConstraintSet.END);
-                constraintSet.clear(cameraBtn.getId(), ConstraintSet.BOTTOM);
-
-                if(callUser.getVideoCode().equals("mov")){
-                    constraintSet.connect(callOffBtn.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 0);
-                    constraintSet.connect(callOffBtn.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
-                    constraintSet.connect(callOffBtn.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 0);
-                    constraintSet.connect(callOffBtn.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0);
-                    //값이 0에 가까울수록 Top 방향에 가깝다
-                    constraintSet.setVerticalBias(callOffBtn.getId(), 0.92f);
-                }else {
-                    constraintSet.connect(callOffBtn.getId(), ConstraintSet.END, R.id.guideline_right, ConstraintSet.END, 0);
-                    constraintSet.connect(callOffBtn.getId(), ConstraintSet.BOTTOM, R.id.guideline_bottom, ConstraintSet.TOP, 0);
-                }
-                constraintSet.connect(cameraBtn.getId(), ConstraintSet.END, callOffBtn.getId(), ConstraintSet.START, 16);
-                constraintSet.connect(cameraBtn.getId(), ConstraintSet.BOTTOM, R.id.guideline_bottom, ConstraintSet.TOP, 0);
-                constraintSet.applyTo(constraintLayout);
+                moveCallOffBtn();
                 break;
             case R.id.call_off_btn:
                 if (player.isPlaying()) {
@@ -310,6 +336,31 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
                 break;
 
         }
+    }
+    private void moveCallOffBtn(){
+        ConstraintLayout constraintLayout = findViewById(R.id.view_container);
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone(constraintLayout);
+        //기존 컴포넌트들끼리 연결 끊기
+        constraintSet.clear(callOffBtn.getId(), ConstraintSet.START);
+        constraintSet.clear(callOffBtn.getId(), ConstraintSet.BOTTOM);
+        constraintSet.clear(cameraBtn.getId(), ConstraintSet.END);
+        constraintSet.clear(cameraBtn.getId(), ConstraintSet.BOTTOM);
+
+        if(callUser.getVideoCode().equals("mov")){
+            constraintSet.connect(callOffBtn.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 0);
+            constraintSet.connect(callOffBtn.getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 0);
+            constraintSet.connect(callOffBtn.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 0);
+            constraintSet.connect(callOffBtn.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 0);
+            //값이 0에 가까울수록 Top 방향에 가깝다
+            constraintSet.setVerticalBias(callOffBtn.getId(), 0.92f);
+        }else {
+            constraintSet.connect(callOffBtn.getId(), ConstraintSet.END, R.id.guideline_right, ConstraintSet.END, 0);
+            constraintSet.connect(callOffBtn.getId(), ConstraintSet.BOTTOM, R.id.guideline_bottom, ConstraintSet.TOP, 0);
+        }
+        constraintSet.connect(cameraBtn.getId(), ConstraintSet.END, callOffBtn.getId(), ConstraintSet.START, 16);
+        constraintSet.connect(cameraBtn.getId(), ConstraintSet.BOTTOM, R.id.guideline_bottom, ConstraintSet.TOP, 0);
+        constraintSet.applyTo(constraintLayout);
     }
 
     private void initPlayer() {
@@ -342,7 +393,7 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
                         });
                     }
                 };
-                final int CALL_OFF_WAIT_TIME = 12000;//millisecond
+                final int CALL_OFF_WAIT_TIME = 29000;//millisecond
                 timer.schedule(timerTask, CALL_OFF_WAIT_TIME);
             }
         } catch (Exception e) {
@@ -418,6 +469,7 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
         Log.d(TAG, "Ready:" + playWhenReady + ", State:" + playbackState);
+        WakeLockUtil.acquireCpuWakeLock(this, PowerManager.ACQUIRE_CAUSES_WAKEUP|PowerManager.ON_AFTER_RELEASE);
         if (playbackState == Player.STATE_ENDED) {//영상 모두 끝났을때
             //영상 재생시간 계산
             long millis = player.getDuration() - START_PLAY_POSITION;
@@ -437,10 +489,11 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
             moveToCallEndFragment(bundle);
             Log.d(TAG, "call end: " + playTime);
         } else if (playWhenReady) {//영상 재생 즁
-            playerView.setKeepScreenOn(true);//잠금화면에서 화면이 꺼지지 않게 설정
             callRingStop();
             timer.cancel();
 //            Log.d(TAG, "ringtone is playing:"+ringtone.isPlaying());
+        }else{
+
         }
     }
 
@@ -457,11 +510,11 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
 
         // Commit the transaction
         transaction.commit();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        playerView.setKeepScreenOn(false);
         callOffBtn.setVisibility(View.GONE);
         callPlayBtn.setVisibility(View.GONE);
-        playerView.setKeepScreenOn(false);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         callRingStop();
         ringToneStart = false;
         showSystemUI();
@@ -483,6 +536,7 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
                 .setContentTitle("부재중 알림")
                 .setContentText("월요요정 " + name + "왔어요!")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
                 // Set the intent that will fire when the user taps the notification
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);

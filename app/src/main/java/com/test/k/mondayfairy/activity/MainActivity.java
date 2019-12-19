@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentTransaction;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -31,7 +32,7 @@ import java.util.Calendar;
 import io.fabric.sdk.android.Fabric;
 
 /*사용자가 월요요정 알람을 설정할 수있는 액티비티 클래스*/
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private final String TAG = getClass().getSimpleName();
     private MonDayFairyPicker monDayFairyPicker;
     private int[] dateValues = new int[3];
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView timePickerValueTextView;
     private SharedPreferences preferences;
     private MediaPlayer mediaPlayer;
-
+    private SharedPreferences.Editor editor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,28 +51,12 @@ public class MainActivity extends AppCompatActivity {
         this.showDatePickerDialog();
         this.showTimePickerDialog();
         mediaPlayer = MediaPlayer.create(this, R.raw.bgm_violeta);
-        mediaPlayer.setVolume(0.7f, 0.7f);
+        mediaPlayer.setVolume(1.0f, 1.0f);
         monDayFairyPicker = findViewById(R.id.member_pick_check);
         Button saveBtn = findViewById(R.id.btn_setting_save);
-        saveBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //사용자 설정 값 모두 저장하고
-                //설정값 중 날짜, 시간 값으로 알람매니저설정.
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putInt("year", dateValues[0]);//year
-                editor.putInt("month", dateValues[1]);//month
-                editor.putInt("day", dateValues[2]);//day
-                editor.putInt("hour", timeValues[0]);//hour
-                editor.putInt("min", timeValues[1]);//min
-                editor.putStringSet("member", monDayFairyPicker.getPickerChecked());//pickup member
-                editor.apply();
-                if (createSaveConfirmDialog()) {
-                    CallAlarmManager callAlarm = new CallAlarmManager(getApplicationContext());
-                    callAlarm.setArlarm(preferences);
-                }
-            }
-        });
+        saveBtn.setOnClickListener(this);
+        Button nowCallBtn = findViewById(R.id.btn_now_fairy_call);
+        nowCallBtn.setOnClickListener(this);
     }
 
     @Override
@@ -169,7 +154,10 @@ public class MainActivity extends AppCompatActivity {
         } else if (timeInvalidCheck()) {
             title = getResources().getString(R.string.fail_confirm_dialog_title);
             message = "시간을 예약하지 않으셨네요." + getResources().getString(R.string.fail_confirm_dialog_message);
-        } else {
+        } else if(monDayFairyPicker.getPickerChecked().size()<=0){//선택한 멤버가 아무도 없다면
+            title = getResources().getString(R.string.fail_now_call_dialog_title);
+            message = getResources().getString(R.string.fail_now_call_dialog_message);
+        }else{
             saveSuccess = true;
         }
         new AlertDialog.Builder(this)
@@ -184,7 +172,20 @@ public class MainActivity extends AppCompatActivity {
                 .show();
         return saveSuccess;
     }
-
+    public void createFailNowCallDialog() {
+        String title = getResources().getString(R.string.fail_now_call_dialog_title);
+        String message = getResources().getString(R.string.fail_now_call_dialog_message);
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(R.string.positive_btn_text, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+    }
     // Create and show a DatePickerDialog when click button.
     private void showDatePickerDialog() {
         //설정값이 있을 경우와 없을경우
@@ -305,4 +306,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btn_now_fairy_call:
+                //사용자 설정 값 모두 저장하고
+                //설정값 중 날짜, 시간 값으로 알람매니저설정.
+                editor = preferences.edit();
+                editor.putStringSet("member", monDayFairyPicker.getPickerChecked());//pickup member
+                editor.apply();
+                if(monDayFairyPicker.getPickerChecked().size()>0) {//사용자가 선택한 멤버가 있는지 확인
+                    Intent callActivityIntent = new Intent(this, CallPlayerActivity.class);
+                    startActivity(callActivityIntent);
+                }else{//멤버선택이 안되어있을시 알림 Dialog 띄움
+                    createFailNowCallDialog();
+                }
+                break;
+            case R.id.btn_setting_save:
+                //사용자 설정 값 모두 저장하고
+                //설정값 중 날짜, 시간 값으로 알람매니저설정.
+                editor = preferences.edit();
+                editor.putInt("year", dateValues[0]);//year
+                editor.putInt("month", dateValues[1]);//month
+                editor.putInt("day", dateValues[2]);//day
+                editor.putInt("hour", timeValues[0]);//hour
+                editor.putInt("min", timeValues[1]);//min
+                editor.putStringSet("member", monDayFairyPicker.getPickerChecked());//pickup member
+                editor.apply();
+                if (createSaveConfirmDialog()) {
+                    CallAlarmManager callAlarm = new CallAlarmManager(getApplicationContext());
+                    callAlarm.setArlarm(preferences);
+                }
+                break;
+        }
+    }
 }

@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.PowerManager;
 import android.util.Log;
 
 import com.test.k.mondayfairy.activity.CallPlayerActivity;
@@ -20,7 +21,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         try {
             Log.d("TAG","Alarm Receive");
-            WakeLockUtil.acquireCpuWakeLock(context);
+            WakeLockUtil.acquireCpuWakeLock(context, PowerManager.PARTIAL_WAKE_LOCK);
             if (intent!=null&& Objects.equals(intent.getAction(), "android.intent.action.BOOT_COMPLETED")) {
                 //재부팅을 하면 알람 설정이 지워지므로 다시 알람을 재설정해준다
                 Log.d("TAG","Alarm Receive Boot");
@@ -40,6 +41,8 @@ public class AlarmReceiver extends BroadcastReceiver {
             e.printStackTrace();
         }catch (NullPointerException ne){
             ne.printStackTrace();
+        }finally {
+            WakeLockUtil.releaseCpuWakeLock();
         }
     }
 
