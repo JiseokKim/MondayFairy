@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.regex.Pattern;
+
 /*가짜 영상통화때 재생할 영상 URI를 관리하는 클래스*/
 public class CallVideoManager {
     private final String TAG = "CallVideoManager";
@@ -36,10 +38,16 @@ public class CallVideoManager {
         Field[] fields = R.raw.class.getFields();
         ArrayList<String> videoList = new ArrayList<>();
         int size = fields.length;
-        for (int i = 0; i < size - 1; i++) {
-            videoList.add(fields[i].getName());
-            //do your thing here
-            Log.d(TAG, "File Name:" + videoList.get(i));
+        int i,j=0;
+        String videoPattern = "^(call|mov)+[_]";//파일이름이 call_이나 mov_로 시작하는 정규표현식
+        Pattern pattern = Pattern.compile(videoPattern);
+        for (i = 0; i < size; i++) {
+            if(pattern.matcher(fields[i].getName()).find()) {//영상파일만 가져옴
+                videoList.add(fields[i].getName());
+                //do your thing here
+                Log.d(TAG, "File Name:" + videoList.get(j));
+                j++;
+            }
         }
         return videoList;
     }
@@ -50,14 +58,14 @@ public class CallVideoManager {
         String[] fileNames = new String[FILE_COUNT_OF_MEMBER];
         int count = 0;
         int listSize = videoList.size();
+        Log.d(TAG,"전체파일 갯수:"+listSize);
         //사용자가 모두를 선택했을 경우 전체 파일중 2개를 선택한다
         if(searchText.equals("izone")){
             Random random = new Random();
             int arraySize = fileNames.length;
             //모든 영상 파일 수
-            int videoListSize = videoList.size();
             for(int i =  0; i<arraySize; i++){
-                fileNames[i] = videoList.get(random.nextInt(videoListSize));
+                fileNames[i] = videoList.get(random.nextInt(listSize));
             }
             return fileNames;
         }

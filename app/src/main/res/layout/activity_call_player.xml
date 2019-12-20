@@ -50,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/text_call_view"
-            android:text="전화가 왔습니다"
+            android:text="@string/call_view_text"
             android:textSize="20sp"
             android:textColor="@android:color/white"
             android:visibility="invisible"
@@ -85,7 +85,7 @@
             android:layout_height="@dimen/call_player_btn_size"
             android:id="@+id/call_play_btn"
             android:background="@android:color/transparent"
-            android:contentDescription=""
+            android:contentDescription="@string/call_play_btn_description_text"
             app:layout_constraintBottom_toTopOf="@id/guideline_bottom"
             app:layout_constraintRight_toRightOf="@id/guideline_right" />
 
@@ -94,7 +94,7 @@
             android:layout_height="@dimen/call_player_btn_size"
             android:id="@+id/call_off_btn"
             android:background="@android:color/transparent"
-            android:contentDescription=""
+            android:contentDescription="@string/call_off_btn_description_text"
             app:layout_goneMarginEnd="0dp"
             app:layout_constraintBottom_toTopOf="@id/guideline_bottom"
             app:layout_constraintStart_toStartOf="@id/guideline_left" />
@@ -103,7 +103,7 @@
             android:layout_height="@dimen/call_player_btn_size"
             android:id="@+id/call_camera_btn"
             android:background="@android:color/transparent"
-            android:contentDescription=""
+            android:contentDescription="@string/camera_on_off_btn_description_text"
             android:layout_marginEnd="16dp"
             app:layout_constraintBottom_toTopOf="@id/guideline_bottom"
             app:layout_constraintEnd_toStartOf="@id/guideline_left" />

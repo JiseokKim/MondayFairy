@@ -9,8 +9,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -75,6 +73,7 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
     private TextView callNameTextView;
     private TextView callTextView;
     private Timer timer;
+    private Timer touchTimer;
     private boolean ringToneStart = true;
     private AudioManager audioManager;
     private CallUser callUser;
@@ -200,8 +199,8 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
                     });
                 }
             };
-            Timer timer = new Timer();
-            timer.schedule(timerTask, 0, 4500);
+            touchTimer = new Timer();
+            touchTimer.schedule(timerTask, 0, 4500);
         }
     }
     @Override
@@ -219,10 +218,11 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
             userFaceView.onPause();
         }
     }
+
     @Override
-
     protected void onStop() {
-
+        super.onStop();
+        Log.d(TAG,"onStop()");
         playerView.setPlayer(null);
 
         player.release();
@@ -244,7 +244,6 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
             vibrator = null;
 
         }
-        super.onStop();
 
     }
 
@@ -253,6 +252,7 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
 
     protected void onDestroy() {
         super.onDestroy();
+        Log.d(TAG,"onDestory()");
         //배터리 관리를 위해 사용이 끝나면 wakeLock 해제
         WakeLockUtil.releaseCpuWakeLock();
     }
@@ -322,20 +322,19 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
 
     }
 
-    private Bundle createBundleData() {
-        long millis = player.getCurrentPosition();
+    private Bundle createBundleData(int startPosition) {
+        long millis = player.getCurrentPosition()-startPosition;
         String playTime = String.format(Locale.US,"%02d:%02d",
                 TimeUnit.MILLISECONDS.toMinutes(millis),
                 TimeUnit.MILLISECONDS.toSeconds(millis) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis))
         );
-        BitmapDrawable drawables = (BitmapDrawable) getResources().getDrawable(callUser.getThumbnailId());
-        Bitmap userPicture = drawables.getBitmap();
+        Log.d(TAG, "call end: " + playTime);
         //영상이름과 관련된 월요요정 이름과 썸네일을 넘기는 기능 구현 필요
         Bundle data = new Bundle();
         data.putString("time", playTime);
         data.putString("name", callUser.getCallName());
-        data.putParcelable("picture", userPicture);
+        data.putInt("picture", callUser.getThumbnailId());
         return data;
     }
 
@@ -356,7 +355,7 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
                     player.stop();
                 }
                 timer.cancel();//사용자가 직접 통화 종료시 알람을 띄우지 않는다
-                moveToCallEndFragment(createBundleData());
+                moveToCallEndFragment(createBundleData(0));
                 break;
             case R.id.call_camera_btn:
                 PackageManager pm = this.getPackageManager();
@@ -524,27 +523,11 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
         Log.d(TAG, "Ready:" + playWhenReady + ", State:" + playbackState);
         WakeLockUtil.acquireCpuWakeLock(this, PowerManager.ACQUIRE_CAUSES_WAKEUP|PowerManager.ON_AFTER_RELEASE);
         if (playbackState == Player.STATE_ENDED) {//영상 모두 끝났을때
-            //영상 재생시간 계산
-            long millis = player.getDuration() - START_PLAY_POSITION;
-            String playTime = String.format(Locale.US, "%02d:%02d",
-                    TimeUnit.MILLISECONDS.toMinutes(millis),
-                    TimeUnit.MILLISECONDS.toSeconds(millis) -
-                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis))
-            );
-            BitmapDrawable drawables = (BitmapDrawable) getResources().getDrawable(callUser.getThumbnailId());
-            Bitmap userPicture = drawables.getBitmap();
-            //영상이름과 관련된 월요요정 이름과 썸네일을 넘기는 기능 구현 필요
-            Bundle bundle = new Bundle();
-            bundle.putString("time", playTime);
-            bundle.putString("name", callUser.getCallName());
-            bundle.putParcelable("picture", userPicture);
             //move call player end fragment
-            moveToCallEndFragment(bundle);
-            Log.d(TAG, "call end: " + playTime);
+            moveToCallEndFragment(createBundleData(START_PLAY_POSITION));
         } else if (playWhenReady) {//영상 재생 즁
             callRingStop();
             timer.cancel();
-//            Log.d(TAG, "ringtone is playing:"+ringtone.isPlaying());
         }
     }
 
@@ -569,6 +552,9 @@ public class CallPlayerActivity extends AppCompatActivity implements View.OnClic
         callRingStop();
         ringToneStart = false;
         showSystemUI();
+        if(touchTimer!=null) {
+            touchTimer.cancel();
+        }
     }
 
     final String CHANNEL_ID = "1212";

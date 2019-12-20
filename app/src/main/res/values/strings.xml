@@ -66,6 +66,7 @@
     <string name="talk_time_default_text">00:00</string>
     <string name="channel_name">월요요정 알림</string>
     <string name="channel_description">월요요정 알림채널</string>
+    <string name="call_view_text">전화가 왔습니다</string>
     <!--Description Text-->
     <string name="bgm_play_btn_description_text">배경음악 재생</string>
     <string name="dev_purpose_description_text">개발목적 알림 다이얼로그</string>
@@ -76,6 +77,7 @@
     <string name="date_picker_btn_description_text">날짜선택</string>
     <string name="time_picker_btn_description_text">시간선택</string>
     <string name="call_now_btn_description_text">월요요정 영상 알람없이 바로 재생</string>
+    <string name="camera_on_off_btn_description_text">전면 카메라 켜기 끄기</string>
 
 
 

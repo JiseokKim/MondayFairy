@@ -3,6 +3,7 @@ package com.test.k.mondayfairy.fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,7 +40,8 @@ public class CallPlayerEndFragment extends Fragment implements CallPlayerActivit
         if(data != null){
             talkTimeTextView.setText(data.getString("time"));
             talkUserNameView.setText(data.getString("name"));
-            Bitmap userPicture = data.getParcelable("picture");
+            BitmapDrawable drawables = (BitmapDrawable) getResources().getDrawable(data.getInt("picture"));
+            Bitmap userPicture = drawables.getBitmap();
             Log.d(TAG,"picture:"+userPicture.getByteCount());
             talkUserImageView.setImageBitmap(userPicture);
             LinearLayout background = view.findViewById(R.id.layout_call_end_text);
